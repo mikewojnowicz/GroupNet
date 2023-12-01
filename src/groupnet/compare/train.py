@@ -18,7 +18,6 @@ torch.backends.cudnn.benchmark = True
 parser = argparse.ArgumentParser()
 parser.add_argument("--num_train_games", type=int) # in [1,5,20]
 parser.add_argument('--seed', type=int, default=1)
-parser.add_argument('--dataset', default='nba')
 parser.add_argument('--batch_size', type=int, default=32)
 # Their default for --past_length was 5.   
 # But their sampling rate is half of ours (they use 2.5 Hz vs our 5 Hz);
