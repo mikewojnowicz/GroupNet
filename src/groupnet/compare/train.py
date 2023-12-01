@@ -14,6 +14,9 @@ from groupnet.compare.data_loader import make_data_loader
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = True
+
+NUM_TRAIN_GAMES = 1 # in [1,5,20]
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, default=1)
 parser.add_argument('--dataset', default='nba')
@@ -46,7 +49,7 @@ parser.add_argument('--hyper_scales', nargs='+', type=int,default=[5,11])
 parser.add_argument('--num_decompose', type=int, default=2)
 parser.add_argument('--min_clip', type=float, default=2.0)
 
-parser.add_argument('--model_save_dir', default='saved_models/nba')
+parser.add_argument('--model_save_dir', default=f'saved_models/nba/{NUM_TRAIN_GAMES}_train_games/')
 parser.add_argument('--model_save_epoch', type=int, default=1)
 
 parser.add_argument('--epoch_continue', type=int, default=0)
@@ -102,7 +105,7 @@ if args.epoch_continue > 0:
         scheduler.load_state_dict(model_load['scheduler'])
 
 """ dataloader """
-train_loader = make_data_loader("train_1", args.past_length, args.future_length, args.batch_size)
+train_loader = make_data_loader("train_{NUM_TRAIN_GAMES}", args.past_length, args.future_length, args.batch_size)
 
 """ start training """
 model.set_device(device)
