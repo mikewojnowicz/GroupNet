@@ -4,10 +4,9 @@ import torch
 import numpy as np
 from torch import nn
 from torch.nn import functional as F
-from collections import defaultdict
-from model.utils import initialize_weights
-from .MS_HGNN_batch import MS_HGNN_oridinary,MS_HGNN_hyper, MLP
-import math
+
+from groupnet.model.utils import initialize_weights
+from groupnet.model.MS_HGNN_batch import MS_HGNN_oridinary,MS_HGNN_hyper, MLP
 
 class DecomposeBlock(nn.Module):
     '''
