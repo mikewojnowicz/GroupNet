@@ -1,0 +1,4 @@
+devel/
+**/**.pyc
+.DS_Store
+
