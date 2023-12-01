@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-import time
 import numpy as np
 import torch
 import random
@@ -9,9 +8,9 @@ from torch import optim
 from torch.optim import lr_scheduler
 sys.path.append(os.getcwd())
 from torch.utils.data import DataLoader
-from data.dataloader_nba import NBADataset, seq_collate
-from model.GroupNet_nba import GroupNet
-import math
+
+from groupnet.data.dataloader_nba import NBADataset, seq_collate
+from groupnet.model.GroupNet_nba import GroupNet
 
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.deterministic = True

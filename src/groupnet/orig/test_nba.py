@@ -2,17 +2,15 @@ import numpy as np
 import argparse
 import os
 import sys
-import subprocess
-import shutil
 import random
 sys.path.append(os.getcwd())
 import torch
-from data.dataloader_nba import NBADataset, seq_collate
-from model.GroupNet_nba import GroupNet
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from matplotlib import animation
-import matplotlib.lines as mlines
+
+from groupnet.data.dataloader_nba import NBADataset, seq_collate
+from groupnet.model.GroupNet_nba import GroupNet
+
 
 class Constant:
     """A class for handling constants"""
