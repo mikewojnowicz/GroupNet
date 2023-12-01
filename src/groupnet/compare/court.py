@@ -1,7 +1,6 @@
 import copy
 from typing import Union
 
-import matplotlib.image as mpimg
 import numpy as np
 
 
@@ -30,11 +29,6 @@ X_MAX_COURT = 94
 Y_MIN_COURT = 0
 Y_MAX_COURT = 50
 
-
-# TODO: Can I make a scheme where I plot the court in the NORMALIZED coords,
-# so that I don't have to unnormalize all the time?!
-COURT_AXIS_UNNORM = [X_MIN_COURT, X_MAX_COURT, Y_MIN_COURT, Y_MAX_COURT]
-COURT_IMAGE = mpimg.imread("image/nba_court_T.png")
 
 ###
 # Normalize/Unnormalize
@@ -66,6 +60,20 @@ def unnormalize_coords(coords_normalized: Union[NumpyArray2D, NumpyArray3D]) -> 
     player_coords_unnormalized[..., 0] *= X_MAX_COURT
     player_coords_unnormalized[..., 1] *= Y_MAX_COURT
     return player_coords_unnormalized
+
+
+def unnormalize_coords_to_meters(coords_normalized: Union[NumpyArray2D, NumpyArray3D]) -> Union[NumpyArray2D, NumpyArray3D]:
+    """
+    GroupNet trained NBA data in meters, not feet.
+
+    Arguments:
+        coords_normalized: NumpyArray whose last axis has shape D=2, representing x and y
+        coordinates on the court
+    """
+    FEET_TO_METERS = 28/94
+
+    coords_unnormalized=unnormalize_coords(coords_normalized)
+    return coords_unnormalized * FEET_TO_METERS 
 
 
 ###
