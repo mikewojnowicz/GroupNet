@@ -7,7 +7,6 @@ cachetools
 certifi
 charset-normalizer
 cycler
-dataclasses
 decorator
 easydict
 future
@@ -52,7 +51,6 @@ scikit-learn
 scipy
 seaborn
 six
-sklearn
 soupsieve
 tensorboard
 tensorboard-data-server
