@@ -76,7 +76,7 @@ class BasketballDataset(Dataset):
         return result
 
 # Example usage
-DATA_DIR = "/Users/miw267/Repos/dynagroup/data/basketball/baller2vec_format/processed/"
+DATA_DIR = "data/basketball/baller2vec_format/processed/"
 coords_filepath = os.path.join(DATA_DIR, "player_coords_train__with_1_games.npy")
 example_stop_idxs_filepath = os.path.join(DATA_DIR, "example_stop_idxs_train__with_1_games.npy")
 
@@ -89,6 +89,6 @@ batch_size = 32
 
 # Create a dataset which has __getitem__ defined to give a batch in the form expected by GroupNet
 basketball_dataset = BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
-dataloader = DataLoader(basketball_dataset)
+train_loader = DataLoader(basketball_dataset)
 
-result =  next(iter(dataloader))
+

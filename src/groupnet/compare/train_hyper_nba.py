@@ -7,11 +7,9 @@ import random
 from torch import optim
 from torch.optim import lr_scheduler
 sys.path.append(os.getcwd())
-from torch.utils.data import DataLoader
 
-from groupnet.data.dataloader_nba import NBADataset, seq_collate
 from groupnet.model.GroupNet_nba import GroupNet
-
+from groupnet.compare.data_loader import train_loader
 
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.deterministic = True
@@ -92,19 +90,6 @@ model = GroupNet(args,device)
 optimizer = optim.Adam(model.parameters(), lr=args.lr)
 scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_step, gamma=args.decay_gamma)
 
-""" dataloader """
-train_set = NBADataset(
-    obs_len=args.past_length,
-    pred_len=args.future_length,
-    training=True)
-
-train_loader = DataLoader(
-    train_set,
-    batch_size=args.batch_size,
-    shuffle=True,
-    num_workers=4,
-    collate_fn=seq_collate,
-    pin_memory=True)
 
 """ Loading if needed """
 if args.epoch_continue > 0:
