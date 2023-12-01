@@ -15,9 +15,8 @@ torch.backends.cudnn.enabled = True
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = True
 
-NUM_TRAIN_GAMES = 1 # in [1,5,20]
-
 parser = argparse.ArgumentParser()
+parser.add_argument("--num_train_games", type=int) # in [1,5,20]
 parser.add_argument('--seed', type=int, default=1)
 parser.add_argument('--dataset', default='nba')
 parser.add_argument('--batch_size', type=int, default=32)
@@ -49,12 +48,15 @@ parser.add_argument('--hyper_scales', nargs='+', type=int,default=[5,11])
 parser.add_argument('--num_decompose', type=int, default=2)
 parser.add_argument('--min_clip', type=float, default=2.0)
 
-parser.add_argument('--model_save_dir', default=f'saved_models/nba/{NUM_TRAIN_GAMES}_train_games/')
 parser.add_argument('--model_save_epoch', type=int, default=1)
 
 parser.add_argument('--epoch_continue', type=int, default=0)
 parser.add_argument('--gpu', type=int, default=0)
 args = parser.parse_args()
+
+""" dir """
+MODEL_SAVE_DIR = f'saved_models/nba/{args.num_train_games}_train_games/'
+
 
 """ setup """
 np.random.seed(args.seed)
@@ -95,7 +97,7 @@ scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_step, gamma=args
 
 """ Loading if needed """
 if args.epoch_continue > 0:
-    checkpoint_path = os.path.join(args.model_save_dir,str(args.epoch_continue)+'.p')
+    checkpoint_path = os.path.join(MODEL_SAVE_DIR,str(args.epoch_continue)+'.p')
     print('load model from: {checkpoint_path}')
     model_load = torch.load(checkpoint_path, map_location='cpu')
     model.load_state_dict(model_load['model_dict'])
@@ -105,7 +107,7 @@ if args.epoch_continue > 0:
         scheduler.load_state_dict(model_load['scheduler'])
 
 """ dataloader """
-train_loader = make_data_loader("train_{NUM_TRAIN_GAMES}", args.past_length, args.future_length, args.batch_size)
+train_loader = make_data_loader(f"train_{args.num_train_games}", args.past_length, args.future_length, args.batch_size)
 
 """ start training """
 model.set_device(device)
@@ -114,7 +116,7 @@ for epoch in range(args.epoch_continue, args.num_epochs):
     """ save model """
     if  (epoch + 1) % args.model_save_epoch == 0:
         model_saved = {'model_dict': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch + 1,'model_cfg': args}
-        saved_path = os.path.join(args.model_save_dir,str(epoch+1)+'.p')
+        saved_path = os.path.join(MODEL_SAVE_DIR,str(epoch+1)+'.p')
         torch.save(model_saved, saved_path)
 
 

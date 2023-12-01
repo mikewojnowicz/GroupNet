@@ -5,7 +5,6 @@ import sys
 import random
 sys.path.append(os.getcwd())
 import torch
-from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
 from groupnet.model.GroupNet_nba import GroupNet
@@ -123,7 +122,6 @@ def vis_result(test_loader, args):
     return 
 
 def test_model_all(test_loader, args):
-    total_num_pred = 0
     all_num = 0
     l2error_overall = 0
     l2error_dest = 0
@@ -216,17 +214,19 @@ def test_model_all(test_loader, args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument("--num_train_games", type=int) # in [1,5,20]
     parser.add_argument('--seed', type=int, default=1)
     parser.add_argument('--model_names', default=None)
     parser.add_argument('--gpu', type=int, default=0)
-    parser.add_argument('--model_save_dir', default=f'saved_models/nba/{NUM_TRAIN_GAMES}_train_games/')
     parser.add_argument('--vis', action='store_true', default=False)
     parser.add_argument('--traj_scale', type=int, default=1)
     parser.add_argument('--sample_k', type=int, default=20)
     parser.add_argument('--past_length', type=int, default=5)
     parser.add_argument('--future_length', type=int, default=10)
-
     args = parser.parse_args()
+
+    """ dir """
+    MODEL_SAVE_DIR = f'saved_models/nba/{args.num_train_games}_train_games/'
 
     """ setup """
     names = [x for x in args.model_names.split(',')]
@@ -247,7 +247,7 @@ if __name__ == '__main__':
         torch.cuda.manual_seed_all(args.seed)
 
         """ model """
-        saved_path = os.path.join(args.model_save_dir,str(name)+'.p')
+        saved_path = os.path.join(MODEL_SAVE_DIR, str(name)+'.p')
         print('load model from:',saved_path)
         checkpoint = torch.load(saved_path, map_location='cpu')
         training_args = checkpoint['model_cfg']
