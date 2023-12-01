@@ -1,7 +1,5 @@
 import pandas as pd
 from Event import Event
-from Team import Team
-from Constant import Constant
 import numpy as np
 
 
