@@ -75,20 +75,39 @@ class BasketballDataset(Dataset):
 
         return result
 
-# Example usage
-DATA_DIR = "data/basketball/baller2vec_format/processed/"
-coords_filepath = os.path.join(DATA_DIR, "player_coords_train__with_1_games.npy")
-example_stop_idxs_filepath = os.path.join(DATA_DIR, "example_stop_idxs_train__with_1_games.npy")
+def make_data_loader(
+    data_type : str, past_length: int = 10, future_length: int = 15, batch_size :int = 32
+) -> DataLoader:
+    """
+    Arguments:
+        data_type: str, in ["train_1", "train_5", "train_20", "test"]
+    """
 
-coords = np.load(coords_filepath)
-example_stop_idxs = np.load(example_stop_idxs_filepath)
 
-past_length = 10
-future_length = 15
-batch_size = 32
+    # Example usage
+    DATA_DIR = "data/basketball/baller2vec_format/processed/"
 
-# Create a dataset which has __getitem__ defined to give a batch in the form expected by GroupNet
-basketball_dataset = BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
-train_loader = DataLoader(basketball_dataset)
+    if data_type == "train_1":
+        coords_filepath = os.path.join(DATA_DIR, "player_coords_train__with_1_games.npy")
+        example_stop_idxs_filepath = os.path.join(DATA_DIR, "example_stop_idxs_train__with_1_games.npy")
+    elif data_type == "train_5":
+        coords_filepath = os.path.join(DATA_DIR, "player_coords_train__with_5_games.npy")
+        example_stop_idxs_filepath = os.path.join(DATA_DIR, "example_stop_idxs_train__with_5_games.npy")
+    elif data_type == "train_20":
+        coords_filepath = os.path.join(DATA_DIR, "player_coords_train__with_20_games.npy")
+        example_stop_idxs_filepath = os.path.join(DATA_DIR, "example_stop_idxs_train__with_20_games.npy")
+    elif data_type == "test":
+        coords_filepath = os.path.join(DATA_DIR, "player_coords_test__with_5_games.npy")
+        example_stop_idxs_filepath = os.path.join(DATA_DIR, "example_stop_idxs_test__with_5_games.npy")
+    else: 
+        raise ValueError(f"I don't understand data_type {data_type}, which should tell me whether to train or test"
+                         f"and also the training size.  See function docstring.")  
+
+    coords = np.load(coords_filepath)
+    example_stop_idxs = np.load(example_stop_idxs_filepath)
+
+    # Create a dataset which has __getitem__ defined to give a batch in the form expected by GroupNet
+    basketball_dataset = BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
+    return DataLoader(basketball_dataset)
 
 

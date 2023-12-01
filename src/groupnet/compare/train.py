@@ -9,7 +9,7 @@ from torch.optim import lr_scheduler
 sys.path.append(os.getcwd())
 
 from groupnet.model.GroupNet_nba import GroupNet
-from groupnet.compare.data_loader import train_loader
+from groupnet.compare.data_loader import make_data_loader
 
 torch.backends.cudnn.enabled = True
 torch.backends.cudnn.deterministic = True
@@ -90,7 +90,6 @@ model = GroupNet(args,device)
 optimizer = optim.Adam(model.parameters(), lr=args.lr)
 scheduler = lr_scheduler.StepLR(optimizer, step_size=args.decay_step, gamma=args.decay_gamma)
 
-
 """ Loading if needed """
 if args.epoch_continue > 0:
     checkpoint_path = os.path.join(args.model_save_dir,str(args.epoch_continue)+'.p')
@@ -101,6 +100,9 @@ if args.epoch_continue > 0:
         optimizer.load_state_dict(model_load['optimizer'])
     if 'scheduler' in model_load:
         scheduler.load_state_dict(model_load['scheduler'])
+
+""" dataloader """
+train_loader = make_data_loader("train_1", args.past_length, args.future_length, args.batch_size)
 
 """ start training """
 model.set_device(device)
