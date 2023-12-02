@@ -228,7 +228,8 @@ if __name__ == '__main__':
     names = [x for x in args.model_names.split(',')]
 
     torch.set_default_dtype(torch.float32)
-    device = torch.device('cuda', index=args.gpu) if args.gpu >= 0 and torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cuda', index=0) if torch.cuda.is_available() else torch.device('cpu')
+    #device = torch.device('cuda', index=args.gpu) if args.gpu >= 0 and torch.cuda.is_available() else torch.device('cpu')
     if torch.cuda.is_available(): torch.cuda.set_device(args.gpu)
     torch.set_grad_enabled(False)
 

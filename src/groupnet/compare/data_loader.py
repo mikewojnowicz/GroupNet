@@ -77,18 +77,18 @@ class BasketballDataset(Dataset):
                   'future_traj': future_traj,
                   'seq': 'nba'}
 
+
+DATA_DIR = "data/basketball/baller2vec_format/processed/"
+
 def make_data_loader(
     data_type : str, past_length: int = 10, future_length: int = 15, batch_size :int = 32
 ) -> DataLoader:
     
     """
     Arguments:
-        data_type: str, in ["train_1", "train_5", "train_20", "test"]
+        data_type: str, in ["train_1", "train_5", "train_20"]
     """
 
-
-    # Example usage
-    DATA_DIR = "data/basketball/baller2vec_format/processed/"
 
     if data_type == "train_1":
         coords_filepath = os.path.join(DATA_DIR, "player_coords_train__with_1_games.npy")
@@ -111,6 +111,3 @@ def make_data_loader(
 
     # Create a dataset which has __getitem__ defined to give a batch in the form expected by GroupNet
     return BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
-
-
-
