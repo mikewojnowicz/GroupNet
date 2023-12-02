@@ -10,9 +10,11 @@ import matplotlib.pyplot as plt
 from groupnet.model.GroupNet_nba import GroupNet
 from groupnet.compare.data_loader import DATA_DIR 
 from groupnet.compare.examples import  get_start_and_stop_timestep_idxs_from_event_idx
+from groupnet.compare.court import normalize_coords_from_meters
 
-### HELPERS    
-
+### 
+# HELPERS    
+###
 
 def make_context_sets_for_forecasts(past_length) -> torch.Tensor:
     """
@@ -54,7 +56,9 @@ def make_context_sets_for_forecasts(past_length) -> torch.Tensor:
 
 
 
-### MAIN
+### 
+# MAIN
+###
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_train_games", type=int) # in [1,5,20]
@@ -80,7 +84,6 @@ if __name__ == '__main__':
     if torch.cuda.is_available(): torch.cuda.set_device(args.gpu)
     torch.set_grad_enabled(False)
 
-
     """ seeds """
     np.random.seed(args.seed)
     random.seed(args.seed)
@@ -88,9 +91,9 @@ if __name__ == '__main__':
     torch.cuda.manual_seed_all(args.seed)
 
     """ load model """
-    saved_path = os.path.join(MODEL_SAVE_DIR, str(args.model_name)+'.p')
-    print('load model from:',saved_path)
-    checkpoint = torch.load(saved_path, map_location='cpu')
+    model_path = os.path.join(MODEL_SAVE_DIR, str(args.model_name)+'.p')
+    print('load model from:', model_path)
+    checkpoint = torch.load(model_path, map_location='cpu')
     training_args = checkpoint['model_cfg']
 
     model = GroupNet(training_args,device)            
@@ -100,8 +103,11 @@ if __name__ == '__main__':
 
     """ make forecasts """
     context_sets = make_context_sets_for_forecasts(args.past_length)
+    num_examples,num_players_plus_ball, past_length, num_court_dims=np.shape(context_sets)
     data={"past_traj":  context_sets}
-
     with torch.no_grad():
         forecasts = model.inference(data)
-        
+    num_forecasts=len(forecasts)
+    result=forecasts.view(num_forecasts, num_examples, num_players_plus_ball, args.future_length, num_court_dims)
+    forecasts_in_meters = result[:,:,:10].cpu().numpy()
+    forecasts = normalize_coords_from_meters(forecasts_in_meters) # shape (S,E,J,T,D)

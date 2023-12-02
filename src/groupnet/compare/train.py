@@ -83,15 +83,14 @@ def train(train_loader,epoch, its_per_epoch):
 
         if iter_num % args.iternum_print == 0:
             print('Epochs: {:02d}/{:02d}| It: {:04d}/{:04d} | Total loss: {:03f}| Loss_pred: {:03f}| Loss_recover: {:03f}| Loss_kl: {:03f}| Loss_diverse: {:03f}'
-            .format(epoch,args.num_epochs,iter_num, its_per_epoch, total_loss.item(),loss_pred,loss_recover,loss_kl,loss_diverse))
+            .format(epoch+1, args.num_epochs, iter_num, its_per_epoch, total_loss.item(),loss_pred,loss_recover,loss_kl,loss_diverse))
         iter_num += 1
 
-        if iter_num >= its_per_epoch:
+        if iter_num > its_per_epoch:
             break
 
     scheduler.step()
     model.step_annealer()
-
 
 
 """ model & optimizer """

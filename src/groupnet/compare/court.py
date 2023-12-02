@@ -76,6 +76,20 @@ def unnormalize_coords_to_meters(coords_normalized: Union[NumpyArray2D, NumpyArr
     return coords_unnormalized * FEET_TO_METERS 
 
 
+def normalize_coords_from_meters(
+    player_coords_in_meters: Union[NumpyArray2D, NumpyArray3D]
+) -> Union[NumpyArray2D, NumpyArray3D]:
+    """
+    Arguments:
+        player_coords_unnormalized: NumpyArray whose last axis has shape D=2, representing x and y
+        coordinates on the court
+
+    """
+    METERS_TO_FEET = 94/28
+    player_coords_unnormalized = player_coords_in_meters * METERS_TO_FEET
+    return normalize_coords(player_coords_unnormalized)
+
+
 ###
 # Flip
 ###
