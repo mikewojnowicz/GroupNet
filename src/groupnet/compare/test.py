@@ -217,8 +217,8 @@ if __name__ == '__main__':
     parser.add_argument('--vis', action='store_true', default=False)
     parser.add_argument('--traj_scale', type=int, default=1)
     parser.add_argument('--sample_k', type=int, default=20)
-    parser.add_argument('--past_length', type=int, default=5)
-    parser.add_argument('--future_length', type=int, default=10)
+    parser.add_argument('--past_length', type=int, default=10)
+    parser.add_argument('--future_length', type=int, default=15)
     args = parser.parse_args()
 
     """ dir """
