@@ -52,7 +52,7 @@ def make_context_sets_in_meters(past_length) -> torch.Tensor:
 
         context_sets_normalized[e:,:num_players] = xs_test_example[T_context-past_length: T_context].swapaxes(0,1) # pre-swap shape (T,J,D); post-swap: (J,T,D)
 
-    context_sets = unnormalize_coords_to_meters(context_sets)
+    context_sets = unnormalize_coords_to_meters(context_sets_normalized)
     return torch.Tensor(context_sets)
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     parser.add_argument('--traj_scale', type=int, default=1)
     parser.add_argument('--sample_k', type=int, default=20)
     parser.add_argument('--past_length', type=int, default=10)
-    parser.add_argument('--future_length', type=int, default=15)
+    parser.add_argument('--future_length', type=int, default=30)
     args = parser.parse_args()
 
     torch.set_default_dtype(torch.float32)
@@ -104,8 +104,9 @@ if __name__ == '__main__':
     num_examples,num_players_plus_ball, past_length, num_court_dims=np.shape(context_sets)
     data={"past_traj":  context_sets}
     with torch.no_grad():
-        forecasts = model.inference(data)
-    num_forecasts=len(forecasts)
-    result=forecasts.view(num_forecasts, num_examples, num_players_plus_ball, args.future_length, num_court_dims)
+        forecasts_in_meters_and_compressed = model.inference(data)
+    num_forecasts=len(forecasts_in_meters_and_compressed)
+    result = forecasts_in_meters_and_compressed.view(num_forecasts, num_examples, num_players_plus_ball, args.future_length, num_court_dims)
     forecasts_in_meters = result[:,:,:10].cpu().numpy()
     forecasts = normalize_coords_from_meters(forecasts_in_meters) # shape (S,E,J,T,D)
+    np.save(f"forecasts_{args.num_train_games}_train_games.npy", forecasts)

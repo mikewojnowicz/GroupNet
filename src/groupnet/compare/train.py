@@ -30,7 +30,7 @@ parser.add_argument('--past_length', type=int, default=10)
 # They say ["We predict the future 10 timestamps (4.0s) based on the historical 5 timestamps (2.0s)"]  
 # Hence, we match to our future window size (6.0s), but adjust the number of timesteps to account for
 # sampling rate differneces. 
-parser.add_argument('--future_length', type=int, default=15)
+parser.add_argument('--future_length', type=int, default=30)
 parser.add_argument('--traj_scale', type=int, default=1)
 parser.add_argument('--learn_prior', action='store_true', default=False)
 parser.add_argument('--lr', type=float, default=1e-4)
