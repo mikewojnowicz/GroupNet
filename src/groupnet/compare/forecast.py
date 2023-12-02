@@ -62,9 +62,9 @@ def make_context_sets_in_meters(past_length) -> torch.Tensor:
 ###
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--num_train_games", type=int) # in [1,5,20]
-    parser.add_argument('--seed', type=int, default=1)
+    parser.add_argument("--num_train_games", type=int, default=None) # in [1,5,20]
     parser.add_argument('--model_name', default=None)
+    parser.add_argument('--seed', type=int, default=1)
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--vis', action='store_true', default=False)
     parser.add_argument('--traj_scale', type=int, default=1)
@@ -109,4 +109,6 @@ if __name__ == '__main__':
     result = forecasts_in_meters_and_compressed.view(num_forecasts, num_examples, num_players_plus_ball, args.future_length, num_court_dims)
     forecasts_in_meters = result[:,:,:10].cpu().numpy()
     forecasts = normalize_coords_from_meters(forecasts_in_meters) # shape (S,E,J,T,D)
-    np.save(f"forecasts_{args.num_train_games}_train_games.npy", forecasts)
+    forecasts_savepath=f"forecasts_{args.num_train_games}_train_games.npy"
+    np.save(forecasts_savepath, forecasts)
+    print(f"Wrote forecasts to {forecasts_savepath}.")

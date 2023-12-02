@@ -17,6 +17,8 @@ torch.backends.cudnn.benchmark = True
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--num_train_games", type=int) # in [1,5,20]
+parser.add_argument('--num_epochs', type=int, default=50)
+parser.add_argument('--its_per_epoch', type=int, default=1000)
 parser.add_argument('--seed', type=int, default=1)
 parser.add_argument('--batch_size', type=int, default=32)
 # Their default for --past_length was 5.   
@@ -36,8 +38,6 @@ parser.add_argument('--learn_prior', action='store_true', default=False)
 parser.add_argument('--lr', type=float, default=1e-4)
 parser.add_argument('--sample_k', type=int, default=20)
 # We save the model after every `num_epochs` epochs.  For each epoch we run `its_per_epoch` iterations.
-parser.add_argument('--num_epochs', type=int, default=50)
-parser.add_argument('--its_per_epoch', type=int, default=1000)
 parser.add_argument('--decay_step', type=int, default=10)
 parser.add_argument('--decay_gamma', type=float, default=0.5)
 parser.add_argument('--iternum_print', type=int, default=100)
