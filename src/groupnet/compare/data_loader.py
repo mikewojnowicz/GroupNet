@@ -46,34 +46,37 @@ class BasketballDataset(Dataset):
             such that
                 result["seq"]="nba"
                 result["past_traj"] is torch.Tensor with shape 
-                    (num_players_plus_ball=11, past_length, dims_of_court=2)
+                    (batch_size, num_players_plus_ball=11, past_length, dims_of_court=2)
                 result["future_traj"]  torch.Tensor with shape 
-                    (num_players_plus_ball=11, future_length, dims_of_court=2)
+                    (batch_size, num_players_plus_ball=11, future_length, dims_of_court=2)
         """
         T = len(self.coords)
         num_players_plus_ball = 11
         court_dims = 2
-        past_traj = torch.zeros((num_players_plus_ball, self.past_length, court_dims))
-        future_traj = torch.zeros((num_players_plus_ball, self.future_length, court_dims))
-
-        next_example_stop_idx, t_end = -np.inf, np.inf
-        while next_example_stop_idx < t_end - 1:
-            t_start = random.randint(0, T - 1)
-            next_example_stop_idx = next((item for item in self.example_stop_idxs if item > t_start), None)
-            t_end_plus_one = t_start + self.past_length + self.future_length
-            t_end = t_end_plus_one - 1
-
-        past_coords = self.coords[t_start:t_start + self.past_length]
-        future_coords = self.coords[t_start + self.past_length:t_start + self.past_length + self.future_length]
+        past_traj = torch.zeros((self.batch_size, num_players_plus_ball,self.past_length,court_dims))
+        future_traj = torch.zeros((self.batch_size, num_players_plus_ball,self.future_length,court_dims))
         
-        past_traj[:10] = torch.Tensor(unnormalize_coords_to_meters(past_coords)).permute(1, 0, 2)
-        future_traj[:10] = torch.Tensor(unnormalize_coords_to_meters(future_coords)).permute(1, 0, 2)
 
-        result = {'past_traj': past_traj,
+        for batch_id in range(self.batch_size):
+
+            ### make a batch by finding timestep interval that doesn't overlap with example boundaries
+            next_example_stop_idx, t_end = -np.inf, np.inf
+            while next_example_stop_idx < t_end - 1:
+                t_start = random.randint(0, T - 1)
+                next_example_stop_idx = next((item for item in self.example_stop_idxs if item > t_start), None)
+                t_end_plus_one = t_start + self.past_length + self.future_length
+                t_end = t_end_plus_one - 1
+
+            past_coords = self.coords[t_start:t_start + self.past_length]
+            future_coords = self.coords[t_start + self.past_length:t_start + self.past_length + self.future_length]
+            
+            ### assign batch to the appropriate places
+            past_traj[batch_id,:10] = torch.Tensor(unnormalize_coords_to_meters(past_coords)).permute(1, 0, 2)
+            future_traj[batch_id,:10] = torch.Tensor(unnormalize_coords_to_meters(future_coords)).permute(1, 0, 2)
+
+        return {'past_traj': past_traj,
                   'future_traj': future_traj,
                   'seq': 'nba'}
-
-        return result
 
 def make_data_loader(
     data_type : str, past_length: int = 10, future_length: int = 15, batch_size :int = 32
@@ -108,7 +111,7 @@ def make_data_loader(
     example_stop_idxs = np.load(example_stop_idxs_filepath)
 
     # Create a dataset which has __getitem__ defined to give a batch in the form expected by GroupNet
-    basketball_dataset = BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
-    return DataLoader(basketball_dataset, batch_size)
+    return BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
+
 
 
