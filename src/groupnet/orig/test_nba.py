@@ -96,8 +96,6 @@ def draw_result(future,past,mode='pre'):
 
 
 def vis_result(test_loader, args):
-    total_num_pred = 0
-    all_num = 0
 
     for data in test_loader:
         future_traj = np.array(data['future_traj']) * args.traj_scale # B,N,T,2

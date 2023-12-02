@@ -46,9 +46,9 @@ class BasketballDataset(Dataset):
             such that
                 result["seq"]="nba"
                 result["past_traj"] is torch.Tensor with shape 
-                    (batch_size, num_players_plus_ball=11, past_length, dims_of_court=2)
+                    (num_players_plus_ball=11, past_length, dims_of_court=2)
                 result["future_traj"]  torch.Tensor with shape 
-                    (batch_size, num_players_plus_ball=11, future_length, dims_of_court=2)
+                    (num_players_plus_ball=11, future_length, dims_of_court=2)
         """
         T = len(self.coords)
         num_players_plus_ball = 11
@@ -109,6 +109,6 @@ def make_data_loader(
 
     # Create a dataset which has __getitem__ defined to give a batch in the form expected by GroupNet
     basketball_dataset = BasketballDataset(coords, example_stop_idxs, past_length, future_length, batch_size)
-    return DataLoader(basketball_dataset)
+    return DataLoader(basketball_dataset, batch_size)
 
 

@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 from groupnet.model.GroupNet_nba import GroupNet
 from groupnet.compare.data_loader import make_data_loader
 
-NUM_TRAIN_GAMES = 1 # in [1,5,20]
-
 class Constant:
     """A class for handling constants"""
     NORMALIZATION_COEF = 7
@@ -96,8 +94,6 @@ def draw_result(future,past,mode='pre'):
 
 
 def vis_result(test_loader, args):
-    total_num_pred = 0
-    all_num = 0
 
     for data in test_loader:
         future_traj = np.array(data['future_traj']) * args.traj_scale # B,N,T,2
