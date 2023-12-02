@@ -35,7 +35,9 @@ parser.add_argument('--traj_scale', type=int, default=1)
 parser.add_argument('--learn_prior', action='store_true', default=False)
 parser.add_argument('--lr', type=float, default=1e-4)
 parser.add_argument('--sample_k', type=int, default=20)
-parser.add_argument('--num_epochs', type=int, default=100)
+# We save the model after every `num_epochs` epochs.  For each epoch we run `its_per_epoch` iterations.
+parser.add_argument('--num_epochs', type=int, default=50)
+parser.add_argument('--its_per_epoch', type=int, default=1000)
 parser.add_argument('--decay_step', type=int, default=10)
 parser.add_argument('--decay_gamma', type=float, default=0.5)
 parser.add_argument('--iternum_print', type=int, default=100)
@@ -69,9 +71,8 @@ if torch.cuda.is_available():
 print('device:',device)
 print(args)
 
-def train(train_loader,epoch):
+def train(train_loader,epoch, its_per_epoch):
     model.train()
-    total_iter_num = len(train_loader)
     iter_num = 0
     for data in train_loader:
         total_loss,loss_pred,loss_recover,loss_kl,loss_diverse = model(data)
@@ -82,11 +83,15 @@ def train(train_loader,epoch):
 
         if iter_num % args.iternum_print == 0:
             print('Epochs: {:02d}/{:02d}| It: {:04d}/{:04d} | Total loss: {:03f}| Loss_pred: {:03f}| Loss_recover: {:03f}| Loss_kl: {:03f}| Loss_diverse: {:03f}'
-            .format(epoch,args.num_epochs,iter_num,total_iter_num,total_loss.item(),loss_pred,loss_recover,loss_kl,loss_diverse))
+            .format(epoch,args.num_epochs,iter_num, its_per_epoch, total_loss.item(),loss_pred,loss_recover,loss_kl,loss_diverse))
         iter_num += 1
+
+        if iter_num >= its_per_epoch:
+            break
 
     scheduler.step()
     model.step_annealer()
+
 
 
 """ model & optimizer """
@@ -111,7 +116,7 @@ train_loader = make_data_loader(f"train_{args.num_train_games}", args.past_lengt
 """ start training """
 model.set_device(device)
 for epoch in range(args.epoch_continue, args.num_epochs):
-    train(train_loader,epoch)
+    train(train_loader,epoch, args.its_per_epoch)
     """ save model """
     if  (epoch + 1) % args.model_save_epoch == 0:
         model_saved = {'model_dict': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch + 1,'model_cfg': args}
