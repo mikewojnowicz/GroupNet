@@ -61,11 +61,10 @@ class BasketballDataset(Dataset):
 
             ### make a batch by finding timestep interval that doesn't overlap with example boundaries
             next_example_stop_idx, t_end = -np.inf, np.inf
-            while next_example_stop_idx < t_end - 1:
-                t_start = random.randint(0, T - 1)
+            while next_example_stop_idx < t_end:
+                t_start = random.randint(0, T - self.past_length - self.future_length)
                 next_example_stop_idx = next((item for item in self.example_stop_idxs if item > t_start), None)
-                t_end_plus_one = t_start + self.past_length + self.future_length
-                t_end = t_end_plus_one - 1
+                t_end = t_start + self.past_length + self.future_length
 
             past_coords = self.coords[t_start:t_start + self.past_length]
             future_coords = self.coords[t_start + self.past_length:t_start + self.past_length + self.future_length]
