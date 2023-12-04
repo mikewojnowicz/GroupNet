@@ -135,8 +135,9 @@ class MS_HGNN_oridinary(nn.Module):
         rel_rec = torch.FloatTensor(rel_rec)
         rel_send = torch.FloatTensor(rel_send)
 
-        rel_rec = rel_rec.cuda()
-        rel_send = rel_send.cuda()
+        if torch.cuda.is_available():
+            rel_rec = rel_rec.cuda()
+            rel_send = rel_send.cuda()
 
         rel_rec = rel_rec[None,:,:].repeat(batch,1,1)
         rel_send = rel_send[None,:,:].repeat(batch,1,1)

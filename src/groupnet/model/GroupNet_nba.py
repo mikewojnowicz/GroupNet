@@ -179,6 +179,7 @@ class PastEncoder(nn.Module):
         self.input_fc = nn.Linear(in_dim, self.model_dim)
         self.input_fc2 = nn.Linear(self.model_dim*args.past_length,self.model_dim)
         self.input_fc3 = nn.Linear(self.model_dim+3,self.model_dim)
+        self.p2p = args.p2p 
 
         self.interaction = MS_HGNN_oridinary(
             embedding_dim=16,
@@ -254,6 +255,9 @@ class PastEncoder(nn.Module):
         if len(self.args.hyper_scales) > 2:
             ftraj_inter_hyper3,_ = self.interaction_hyper3(ftraj_input,feat_corr)
 
+        if not self.p2p:
+            ftraj_inter*=0.0
+
         if len(self.args.hyper_scales) == 0:
             final_feature = torch.cat((ftraj_input,ftraj_inter),dim=-1)
         if len(self.args.hyper_scales) == 1:
@@ -276,6 +280,7 @@ class FutureEncoder(nn.Module):
         scale_num = 2 + len(self.args.hyper_scales)
         self.input_fc2 = nn.Linear(self.model_dim*self.args.future_length, self.model_dim)
         self.input_fc3 = nn.Linear(self.model_dim+3, self.model_dim)
+        self.p2p = args.p2p 
 
         self.interaction = MS_HGNN_oridinary(
             embedding_dim=16,
@@ -359,6 +364,9 @@ class FutureEncoder(nn.Module):
         if len(self.args.hyper_scales) > 2:
             ftraj_inter_hyper3,_ = self.interaction_hyper3(ftraj_input,feat_corr)
 
+        if not self.p2p:
+            ftraj_inter*=0.0
+
         if len(self.args.hyper_scales) == 0:
             final_feature = torch.cat((ftraj_input,ftraj_inter),dim=-1)
         if len(self.args.hyper_scales) == 1:
@@ -404,8 +412,12 @@ class Decoder(nn.Module):
 
         x_hat = torch.zeros_like(x_true)
         batch_size = x_true.size(0)
-        prediction = torch.zeros((batch_size, self.future_length, 2)).cuda()
-        reconstruction = torch.zeros((batch_size, self.past_length, 2)).cuda()
+        prediction = torch.zeros((batch_size, self.future_length, 2))
+        reconstruction = torch.zeros((batch_size, self.past_length, 2))
+        
+        if torch.cuda.is_available():
+            prediction = prediction.cuda()
+            reconstruction = reconstruction.cuda()
 
         for i in range(self.num_decompose):
             x_hat, y_hat = self.decompose[i](x_true, x_hat, hidden)
